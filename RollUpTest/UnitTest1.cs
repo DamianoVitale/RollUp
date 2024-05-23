@@ -103,24 +103,46 @@ namespace RollUpTest
         public void RollUpTest6()
         {
             List<Products> products = new List<Products>
-    {
+              {
         new Products(50, "P1", "V1", "G1"),
         new Products(100, "P1", "V1", "G2"),
         new Products(100, "P1", "V2", "G3"),
         new Products(100, "P1", "V2", "G4"),
-    };
+             };
 
             var result = RollUpMethod.RollUpControlVariant(products);
 
-            // Asserting the selected product
+            
             Assert.Equal(50F, result.Selected[0].Price);
-            Assert.Equal("G2", result.Selected[0].Gtin);
-
-            // Asserting the discarded products
+            Assert.Equal("P1", result.Selected[0].Product);
             Assert.Equal(100F, result.Discarded[0].Price);
-            Assert.Equal("V2", result.Discarded[0].Variant);
+            Assert.Equal("G2", result.Discarded[0].Gtin);
             Assert.Equal(100F, result.Discarded[1].Price);
+            Assert.Equal("V2", result.Discarded[1].Variant);
+        }
+
+        [Fact]
+        public void RollUpTest7()
+        {
+            List<Products> products = new List<Products>
+              {
+        new Products(50, "P1", "V1", "G1"),
+        new Products(70, "P1", "V1", "G2"),
+        new Products(100, "P1", "V2", "G3"),
+        new Products(90, "P1", "V2", "G4"),
+             };
+
+            var result = RollUpMethod.RollUpControlProduct(products);
+
+
+            Assert.Equal(50F, result.Selected[0].Price);
+            Assert.Equal("P1", result.Selected[0].Product);
+            Assert.Equal(90F, result.Discarded[0].Price);
+            Assert.Equal("V2", result.Discarded[0].Variant);
+            Assert.Equal(70F, result.Discarded[1].Price);
             Assert.Equal("G2", result.Discarded[1].Gtin);
+            Assert.Equal(100F, result.Discarded[2].Price);
+            Assert.Equal("G3", result.Discarded[2].Gtin);
         }
 
     }

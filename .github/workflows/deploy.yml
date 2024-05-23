@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+    push:
+        branches: ["**"]
+
+jobs:
+    deploy_job:
+        runs-on: "ubuntu-latest"
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-dotnet@v4
+              with:
+                dotnet-version: '8.x.x'
+            - run: dotnet build RollUp
+            - run: dotnet test RollUp
+            - run: dotnet pack RollUp --configuration Release /p:PackageVersion=1.0.${{github.run_number}}
+            - run: |
+                dotnet nuget add source \
+                    --username DamianoVitale \
+                    --password ${{secrets.TOKEN}} \
+                    --store-password-in-clear-text \
+                    --name github "https://nuget.pkg.github.com/DamianoVitale/index.json"
+
+                dotnet nuget push "RollUp/bin/Release/RollUp.1.0.${{github.run_number}}.nupkg" \
+                    --api-key ${{secrets.TOKEN}} \
+                    --source "github"
